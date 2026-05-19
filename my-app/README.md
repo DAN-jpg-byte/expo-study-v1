@@ -1,56 +1,124 @@
-# Welcome to your Expo app 👋
+# expo-study-v1
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo + Node.js でプッシュ通知の仕組みを学ぶサンプルアプリです。
 
-## Get started
+ボタンを押したら届くローカル通知から、サーバーから任意のタイミングで届くプッシュ通知まで、エンドツーエンドで実装しています。
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 画面イメージ
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+[Androidエミュレーター]          [PC上のサーバー]
+  アプリ起動
+    ↓ Push Token を取得
+    ↓ Token をサーバーに送信  →  Token を保存
+                                  POST /send を受信
+    通知が届く ←←←←←←←←←←  Expo Push API に依頼
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## 機能
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- **ローカル通知**：ボタンを押すと3秒後に通知が届く
+- **プッシュ通知**：Node.js サーバーから任意のタイミングで通知を送信できる
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 技術スタック
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| 項目 | 技術 |
+|------|------|
+| アプリ | React Native + Expo SDK 55 |
+| ルーティング | Expo Router |
+| 通知 | expo-notifications |
+| サーバー | Node.js + Express |
+| 通知サービス | Expo Push API |
+| Android 通知基盤 | Firebase Cloud Messaging (FCM v1) |
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## フォルダ構成
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+expo-study-v1/
+├── my-app/                         # Expo アプリ本体
+│   ├── src/
+│   │   ├── app/
+│   │   │   └── explore.tsx         # 通知デモ画面
+│   │   └── utils/
+│   │       └── notifications.ts    # 通知ユーティリティ
+│   ├── app.json                    # Expo 設定
+│   └── eas.json                    # EAS ビルド設定
+├── server/
+│   └── index.js                    # Node.js サーバー
+└── docs/                           # 学習メモ・ドキュメント
+```
+
+---
+
+## セットアップ
+
+### 必要なもの
+
+- Node.js
+- Android Studio（エミュレーター用）
+- Expo アカウント
+- Firebase プロジェクト（プッシュ通知を使う場合）
+
+### 手順
+
+**① パッケージのインストール**
+
+```powershell
+cd my-app
+npm install
+
+cd ../server
+npm install
+```
+
+**② Firebase の設定（プッシュ通知を使う場合）**
+
+1. [Firebase Console](https://console.firebase.google.com/) でプロジェクトを作成
+2. Android アプリを登録（パッケージ名: `com.anonymous.myapp`）
+3. `google-services.json` をダウンロードして `my-app/` に配置
+4. EAS に FCM v1 の認証情報を登録
+
+```powershell
+cd my-app
+eas credentials
+```
+
+**③ アプリを起動**
+
+```powershell
+cd my-app
+npx expo run:android
+```
+
+**④ サーバーを起動**
+
+```powershell
+cd server
+node index.js
+```
+
+**⑤ 通知を送信**
+
+```powershell
+$body = [System.Text.Encoding]::UTF8.GetBytes('{"title":"テスト通知","body":"届きました！"}')
+Invoke-RestMethod -Uri "http://localhost:3000/send" -Method POST -ContentType "application/json; charset=utf-8" -Body $body
+```
+
+---
+
+## ドキュメント
+
+| ファイル | 内容 |
+|---------|------|
+| `docs/project_learning_journey.md` | このプロジェクトの全体的な学習の流れ |
+| `docs/tips_expo_push_notifications.md` | ハマりポイントと解決策まとめ |
+| `docs/spec_push_notifications.md` | プッシュ通知の仕様書 |
+| `docs/handoff_1.md` | 実装の引き継ぎドキュメント |
