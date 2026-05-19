@@ -138,3 +138,64 @@ mkdir docs
 親フォルダ（ルート）にいるままで、`npm run start:app` や `npm run start:server` のように、両方の起動コマンドをコントロールできるようになります。
 
 未来の自分が「もっと本格的にガチガチのモノレポにしたい！」と思ったら、次は「pnpm workspaces」**や**「Turborepo」というキーワードで検索してみてください。このページで構築した「パターンB」が、そのすべての土台になります。
+
+---
+
+## 📂 このプロジェクト（expo-study-v1）の実際の構造
+
+上記の「パターンB：ラッパーフォルダがルート（モノレポ構成）」を採用しています。
+
+### フォルダ構成
+
+```
+expo-study-v1/                      ← git init はここ（プロジェクト全体の親）
+├── .git/                           ← Git の管理フォルダ
+├── .gitignore                      ← Git 除外設定（ルートに1つだけ）
+├── README.md                       ← GitHub トップページに表示される概要
+├── CLAUDE.md                       ← Claude Code 向けのプロジェクト指示書
+│
+├── my-app/                         ← Expo アプリ本体
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── _layout.tsx         ← 全画面共通のレイアウト
+│   │   │   ├── index.tsx           ← ホーム画面
+│   │   │   └── explore.tsx         ← 通知デモ画面
+│   │   ├── utils/
+│   │   │   └── notifications.ts    ← 通知ユーティリティ関数
+│   │   ├── components/             ← 共通 UI コンポーネント
+│   │   ├── constants/              ← テーマ・色などの定数
+│   │   └── hooks/                  ← カスタムフック
+│   ├── assets/                     ← 画像・アイコンなど
+│   ├── app.json                    ← Expo の設定（projectId・Firebase設定）
+│   ├── eas.json                    ← EAS ビルド設定
+│   ├── package.json                ← アプリの依存パッケージ
+│   └── README.md                   ← アプリの詳細なセットアップ手順
+│
+├── server/                         ← Node.js サーバー
+│   ├── index.js                    ← Express サーバー本体
+│   └── package.json                ← サーバーの依存パッケージ
+│
+└── docs/                           ← ドキュメント・学習メモ
+    ├── project_learning_journey.md ← 学習の流れ・全体解説
+    ├── tips_expo_push_notifications.md ← ハマりポイント集
+    ├── spec_push_notifications.md  ← プッシュ通知の仕様書
+    ├── roadmap_push_notifications.md ← 実装ロードマップ
+    ├── handoff_1.md                ← 引き継ぎドキュメント
+    └── repository-guide.md        ← このファイル
+```
+
+### .gitignore で除外しているもの
+
+| 除外対象 | 理由 |
+|---------|------|
+| `my-app/android/` | `npx expo run:android` で自動生成されるネイティブコード |
+| `my-app/ios/` | 同上（iOS ビルド時に生成） |
+| `my-app/google-services.json` | Firebase の認証情報（公開禁止） |
+| `node_modules/` | 依存パッケージ（`npm install` で再生成できる） |
+| `.claude/settings.local.json` | Claude Code のマシン固有設定 |
+
+### GitHub リポジトリ
+
+- URL: `https://github.com/DAN-jpg-byte/expo-study-v1`
+- EAS プロジェクト: `@dannnndannnn/my-app`
+- Firebase プロジェクト ID: `stellar-benefit-290506`
